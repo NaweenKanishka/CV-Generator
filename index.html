@@ -70,6 +70,10 @@
       break-before: page;
     }
 
+    .subtopic {
+      margin-left: 20px;
+    }
+
     @media print {
       .page-break {
         page-break-before: always;
@@ -90,26 +94,22 @@
       <input type="text" id="linkedin" placeholder="LinkedIn URL" />
       <textarea id="summary" placeholder="Professional Summary"></textarea>
 
-      <h2>Academic Qualifications</h2>
-      <textarea id="education" placeholder="List qualifications (one per line)"></textarea>
-
-      <h2>Awards</h2>
-      <textarea id="awards" placeholder="Awards (one per line)"></textarea>
-
-      <h2>Work Experience</h2>
-      <textarea id="experience" placeholder="Job Title - Company\nDetails about role (separate each job with double newline)"></textarea>
-
-      <h2>Projects</h2>
-      <textarea id="projects" placeholder="Project Title - short description (one per line)"></textarea>
-
-      <h2>Technical Skills</h2>
-      <textarea id="technical-skills" placeholder="One per line"></textarea>
-
-      <h2>Other Skills (e.g. Languages)</h2>
-      <textarea id="other-skills" placeholder="One per line"></textarea>
-
-      <h2>Interested In</h2>
-      <textarea id="interests" placeholder="One per line"></textarea>
+      <h2>Dynamic Sections</h2>
+      <div id="dynamic-sections">
+        <div class="dynamic-section">
+          <input type="text" class="section-title" placeholder="Section Title (e.g., Projects)" />
+          <textarea class="section-content" placeholder="Content for the section"></textarea>
+          <h3>Subtopics</h3>
+          <div class="subtopics-container">
+            <div class="subtopic-container">
+              <input type="text" class="subtopic-title" placeholder="Subtopic Title" />
+              <textarea class="subtopic-content" placeholder="Bullet points (separate with newline)"></textarea>
+            </div>
+          </div>
+          <button type="button" onclick="addSubtopic(this)">Add Subtopic</button>
+        </div>
+      </div>
+      <button type="button" onclick="addSection()">Add Another Section</button>
 
       <input type="text" id="dateInput" placeholder="Date (e.g. April 19, 2025)" />
 
@@ -126,40 +126,8 @@
 
       <p id="preview-summary"></p>
 
-      <div class="section">
-        <h2>Academic Qualifications</h2>
-        <ul id="preview-education"></ul>
-      </div>
-
-      <div class="section">
-        <h2>Awards</h2>
-        <ul id="preview-awards"></ul>
-      </div>
-
-      <div class="section page-break">
-        <h2>Work Experience</h2>
-        <div id="preview-experience"></div>
-      </div>
-
-      <div class="section">
-        <h2>Projects</h2>
-        <ul id="preview-projects"></ul>
-      </div>
-
-      <div class="section">
-        <h2>Technical Skills</h2>
-        <ul id="preview-technical-skills"></ul>
-      </div>
-
-      <div class="section">
-        <h2>Other Skills</h2>
-        <ul id="preview-other-skills"></ul>
-      </div>
-
-      <div class="section">
-        <h2>Interested In</h2>
-        <ul id="preview-interests"></ul>
-      </div>
+      <!-- Dynamically added sections will appear here -->
+      <div id="preview-dynamic-sections"></div>
 
       <div class="bottom-section">
         <p><strong>References:</strong> Available upon request</p>
@@ -169,82 +137,133 @@
   </div>
 
   <script>
+    function addSection() {
+      const sectionContainer = document.createElement('div');
+      sectionContainer.classList.add('dynamic-section');
+      
+      const sectionTitle = document.createElement('input');
+      sectionTitle.classList.add('section-title');
+      sectionTitle.setAttribute('type', 'text');
+      sectionTitle.setAttribute('placeholder', 'Section Title (e.g., Projects)');
+      
+      const sectionContent = document.createElement('textarea');
+      sectionContent.classList.add('section-content');
+      sectionContent.setAttribute('placeholder', 'Content for the section');
+
+      const subtopicsContainer = document.createElement('div');
+      subtopicsContainer.classList.add('subtopics-container');
+
+      const subtopicContainer = document.createElement('div');
+      subtopicContainer.classList.add('subtopic-container');
+      
+      const subtopicTitle = document.createElement('input');
+      subtopicTitle.classList.add('subtopic-title');
+      subtopicTitle.setAttribute('type', 'text');
+      subtopicTitle.setAttribute('placeholder', 'Subtopic Title');
+      
+      const subtopicContent = document.createElement('textarea');
+      subtopicContent.classList.add('subtopic-content');
+      subtopicContent.setAttribute('placeholder', 'Bullet points (separate with newline)');
+
+      subtopicContainer.appendChild(subtopicTitle);
+      subtopicContainer.appendChild(subtopicContent);
+      
+      subtopicsContainer.appendChild(subtopicContainer);
+      
+      const addSubtopicButton = document.createElement('button');
+      addSubtopicButton.textContent = "Add Subtopic";
+      addSubtopicButton.setAttribute('type', 'button');
+      addSubtopicButton.onclick = function() {
+        addSubtopic(sectionContainer);
+      };
+
+      sectionContainer.appendChild(sectionTitle);
+      sectionContainer.appendChild(sectionContent);
+      sectionContainer.appendChild(subtopicsContainer);
+      sectionContainer.appendChild(addSubtopicButton);
+
+      document.getElementById('dynamic-sections').appendChild(sectionContainer);
+    }
+
+    function addSubtopic(sectionContainer) {
+      const subtopicContainer = document.createElement('div');
+      subtopicContainer.classList.add('subtopic-container');
+      
+      const subtopicTitle = document.createElement('input');
+      subtopicTitle.classList.add('subtopic-title');
+      subtopicTitle.setAttribute('type', 'text');
+      subtopicTitle.setAttribute('placeholder', 'Subtopic Title');
+      
+      const subtopicContent = document.createElement('textarea');
+      subtopicContent.classList.add('subtopic-content');
+      subtopicContent.setAttribute('placeholder', 'Bullet points (separate with newline)');
+
+      subtopicContainer.appendChild(subtopicTitle);
+      subtopicContainer.appendChild(subtopicContent);
+      
+      sectionContainer.querySelector('.subtopics-container').appendChild(subtopicContainer);
+    }
+
     function updatePreview() {
-      // Reset preview content before updating
-      document.getElementById("preview-name").innerText = "";
-      document.getElementById("preview-title").innerText = "";
-      document.getElementById("preview-phone").innerText = "";
-      document.getElementById("preview-email").innerText = "";
-      document.getElementById("preview-linkedin").innerText = "";
-      document.getElementById("preview-summary").innerText = "";
-      document.getElementById("preview-date").innerText = "";
+      document.getElementById("preview-name").innerText = document.getElementById("name").value || "Your Name";
+      document.getElementById("preview-title").innerText = document.getElementById("title").value || "Job Title";
+      document.getElementById("preview-phone").innerText = document.getElementById("phone").value || "";
+      document.getElementById("preview-email").innerText = document.getElementById("email").value || "";
+      document.getElementById("preview-linkedin").innerText = document.getElementById("linkedin").value || "";
+      document.getElementById("preview-summary").innerText = document.getElementById("summary").value || "";
+      document.getElementById("preview-date").innerText = document.getElementById("dateInput").value || "";
 
-      // Add content only if input is not empty
-      if (document.getElementById("name").value.trim() !== "") {
-        document.getElementById("preview-name").innerText = document.getElementById("name").value;
-      }
-      if (document.getElementById("title").value.trim() !== "") {
-        document.getElementById("preview-title").innerText = document.getElementById("title").value;
-      }
-      if (document.getElementById("phone").value.trim() !== "") {
-        document.getElementById("preview-phone").innerText = document.getElementById("phone").value;
-      }
-      if (document.getElementById("email").value.trim() !== "") {
-        document.getElementById("preview-email").innerText = document.getElementById("email").value;
-      }
-      if (document.getElementById("linkedin").value.trim() !== "") {
-        document.getElementById("preview-linkedin").innerText = document.getElementById("linkedin").value;
-      }
-      if (document.getElementById("summary").value.trim() !== "") {
-        document.getElementById("preview-summary").innerText = document.getElementById("summary").value;
-      }
-      if (document.getElementById("dateInput").value.trim() !== "") {
-        document.getElementById("preview-date").innerText = document.getElementById("dateInput").value;
-      }
+      const dynamicSectionsPreview = document.getElementById("preview-dynamic-sections");
+      dynamicSectionsPreview.innerHTML = ''; // Reset preview
 
-      // Helper function to populate lists
-      function populateList(idInput, idPreview) {
-        const items = document.getElementById(idInput).value.split("\n");
-        const ul = document.getElementById(idPreview);
-        ul.innerHTML = ""; // Reset list before populating
-        items.forEach(item => {
-          if (item.trim()) {
-            const li = document.createElement("li");
-            li.innerText = item.trim();
-            ul.appendChild(li);
-          }
-        });
-      }
+      const sections = document.querySelectorAll('.dynamic-section');
+      
+      sections.forEach(section => {
+        const sectionTitle = section.querySelector('.section-title').value.trim();
+        const sectionContent = section.querySelector('.section-content').value.trim();
 
-      // Update sections only if content is not empty
-      if (document.getElementById("education").value.trim()) populateList("education", "preview-education");
-      if (document.getElementById("awards").value.trim()) populateList("awards", "preview-awards");
-      if (document.getElementById("projects").value.trim()) populateList("projects", "preview-projects");
-      if (document.getElementById("technical-skills").value.trim()) populateList("technical-skills", "preview-technical-skills");
-      if (document.getElementById("other-skills").value.trim()) populateList("other-skills", "preview-other-skills");
-      if (document.getElementById("interests").value.trim()) populateList("interests", "preview-interests");
+        if (sectionTitle && sectionContent) {
+          const sectionDiv = document.createElement('div');
+          const sectionTitleElem = document.createElement('h2');
+          sectionTitleElem.innerText = sectionTitle;
+          const sectionContentElem = document.createElement('p');
+          sectionContentElem.innerText = sectionContent;
 
-      // Work experience content population
-      const experienceText = document.getElementById("experience").value.trim();
-      const experiencePreview = document.getElementById("preview-experience");
-      experiencePreview.innerHTML = ""; // Reset experience before populating
-      if (experienceText) {
-        experienceText.split("\n\n").forEach(block => {
-          const lines = block.split("\n");
-          if (lines.length > 0) {
-            const title = document.createElement("strong");
-            title.innerText = lines[0];
-            const div = document.createElement("div");
-            div.appendChild(title);
-            if (lines.length > 1) {
-              const desc = document.createElement("p");
-              desc.innerText = lines.slice(1).join(" ");
-              div.appendChild(desc);
+          sectionDiv.appendChild(sectionTitleElem);
+          sectionDiv.appendChild(sectionContentElem);
+
+          // Process subtopics
+          const subtopicsContainer = section.querySelector('.subtopics-container');
+          const subtopicElems = [];
+          const subtopicContainers = subtopicsContainer.querySelectorAll('.subtopic-container');
+
+          subtopicContainers.forEach(subtopicContainer => {
+            const subtopicTitle = subtopicContainer.querySelector('.subtopic-title').value.trim();
+            const subtopicContent = subtopicContainer.querySelector('.subtopic-content').value.trim();
+            
+            if (subtopicTitle && subtopicContent) {
+              const subtopicDiv = document.createElement('div');
+              const subtopicTitleElem = document.createElement('h3');
+              subtopicTitleElem.innerText = subtopicTitle;
+
+              const ul = document.createElement('ul');
+              subtopicContent.split('\n').forEach(bullet => {
+                if (bullet.trim()) {
+                  const li = document.createElement('li');
+                  li.innerText = bullet.trim();
+                  ul.appendChild(li);
+                }
+              });
+
+              subtopicDiv.appendChild(subtopicTitleElem);
+              subtopicDiv.appendChild(ul);
+              sectionDiv.appendChild(subtopicDiv);
             }
-            experiencePreview.appendChild(div);
-          }
-        });
-      }
+          });
+
+          dynamicSectionsPreview.appendChild(sectionDiv);
+        }
+      });
     }
 
     function downloadPDF() {
