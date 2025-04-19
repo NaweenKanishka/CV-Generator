@@ -27,9 +27,10 @@
       background: white;
       padding: 30px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      width: 794px;
-      min-height: 1123px;
+      width: 794px; /* A4 Width in pixels */
+      min-height: 1123px; /* A4 Height in pixels */
       box-sizing: border-box;
+      margin: 0 auto;
     }
     .section {
       margin-bottom: 30px;
@@ -104,7 +105,6 @@
       <div id="dynamic-sections">
         <div class="dynamic-section">
           <input type="text" class="section-title" placeholder="Section Title (e.g., Projects)" />
-          <textarea class="section-content" placeholder="Content for the section"></textarea>
           <h3>Subtopics</h3>
           <div class="subtopics-container">
             <div class="subtopic-container">
@@ -152,10 +152,6 @@
       sectionTitle.setAttribute('type', 'text');
       sectionTitle.setAttribute('placeholder', 'Section Title (e.g., Projects)');
       
-      const sectionContent = document.createElement('textarea');
-      sectionContent.classList.add('section-content');
-      sectionContent.setAttribute('placeholder', 'Content for the section');
-
       const subtopicsContainer = document.createElement('div');
       subtopicsContainer.classList.add('subtopics-container');
 
@@ -184,7 +180,6 @@
       };
 
       sectionContainer.appendChild(sectionTitle);
-      sectionContainer.appendChild(sectionContent);
       sectionContainer.appendChild(subtopicsContainer);
       sectionContainer.appendChild(addSubtopicButton);
 
@@ -226,49 +221,39 @@
       
       sections.forEach(section => {
         const sectionTitle = section.querySelector('.section-title').value.trim();
-        const sectionContent = section.querySelector('.section-content').value.trim();
 
-        if (sectionTitle && sectionContent) {
+        if (sectionTitle) {
           const sectionDiv = document.createElement('div');
-          const sectionTitleElem = document.createElement('h2');
-          sectionTitleElem.innerText = sectionTitle;
-          const sectionContentElem = document.createElement('p');
-          sectionContentElem.innerText = sectionContent;
+          const sectionHeading = document.createElement('h2');
+          sectionHeading.innerText = sectionTitle;
+          sectionDiv.appendChild(sectionHeading);
 
-          sectionDiv.appendChild(sectionTitleElem);
-          sectionDiv.appendChild(sectionContentElem);
-
-          // Process subtopics
-          const subtopicsContainer = section.querySelector('.subtopics-container');
-          const subtopicElems = [];
-          const subtopicContainers = subtopicsContainer.querySelectorAll('.subtopic-container');
-
-          subtopicContainers.forEach(subtopicContainer => {
-            const subtopicTitle = subtopicContainer.querySelector('.subtopic-title').value.trim();
-            const subtopicContent = subtopicContainer.querySelector('.subtopic-content').value.trim();
+          const subtopics = section.querySelectorAll('.subtopic-container');
+          subtopics.forEach(subtopic => {
+            const subtopicTitle = subtopic.querySelector('.subtopic-title').value.trim();
+            const subtopicContent = subtopic.querySelector('.subtopic-content').value.trim();
             
             if (subtopicTitle && subtopicContent) {
               const subtopicDiv = document.createElement('div');
-              const subtopicTitleElem = document.createElement('h3');
-              subtopicTitleElem.innerText = subtopicTitle;
-              const subtopicContentElem = document.createElement('ul');
-              const subtopicPoints = subtopicContent.split('\n');
-              
-              subtopicPoints.forEach(point => {
-                const listItem = document.createElement('li');
-                listItem.innerText = point;
-                subtopicContentElem.appendChild(listItem);
-              });
+              const subtopicHeading = document.createElement('h3');
+              subtopicHeading.innerText = subtopicTitle;
+              subtopicDiv.appendChild(subtopicHeading);
 
-              subtopicDiv.appendChild(subtopicTitleElem);
-              subtopicDiv.appendChild(subtopicContentElem);
-              subtopicElems.push(subtopicDiv);
+              const ul = document.createElement('ul');
+              const points = subtopicContent.split('\n');
+              points.forEach(point => {
+                if (point.trim()) {
+                  const li = document.createElement('li');
+                  li.innerText = point.trim();
+                  ul.appendChild(li);
+                }
+              });
+              subtopicDiv.appendChild(ul);
+              sectionDiv.appendChild(subtopicDiv);
             }
           });
 
-          subtopicElems.forEach(subtopic => sectionDiv.appendChild(subtopic));
           dynamicSectionsPreview.appendChild(sectionDiv);
-          dynamicSectionsPreview.appendChild(document.createElement('hr')); // Add line after each section
         }
       });
     }
