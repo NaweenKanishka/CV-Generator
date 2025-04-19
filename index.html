@@ -2,88 +2,153 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CV Generator</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f5f5f5;
+      color: #333;
+    }
+    .container {
+      display: flex;
+      gap: 30px;
+    }
+    form {
+      flex: 1;
+    }
+    #cv-preview {
+      flex: 1;
+      background: white;
+      padding: 30px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 700px;
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    .section h2 {
+      border-bottom: 1px solid #ccc;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+    .skill-bar {
+      display: flex;
+      align-items: center;
+    }
+    .bars {
+      display: flex;
+      margin-left: 10px;
+    }
+    .bar {
+      width: 10px;
+      height: 10px;
+      background: #ccc;
+      margin-right: 2px;
+    }
+    .bar.active {
+      background: #333;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 6px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 20px;
+      background: #333;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
+  <h1>CV Generator</h1>
   <div class="container">
-    <h2>Create Your CV</h2>
-    <form id="cvForm">
-      <label>Full Name:</label>
-      <input type="text" name="full_name" id="full_name" required>
+    <form id="cv-form">
+      <h2>Basic Info</h2>
+      <input type="text" id="name" placeholder="Full Name" />
+      <input type="text" id="title" placeholder="Job Title" />
+      <input type="text" id="phone" placeholder="Phone Number" />
+      <input type="text" id="email" placeholder="Email" />
+      <input type="text" id="linkedin" placeholder="LinkedIn URL" />
+      <textarea id="summary" placeholder="Professional Summary"></textarea>
 
-      <label>Email:</label>
-      <input type="email" name="email" id="email" required>
+      <h2>Experience</h2>
+      <textarea id="experience" placeholder="Work Experience (format it yourself)"></textarea>
 
-      <label>Phone:</label>
-      <input type="text" name="phone" id="phone">
+      <h2>Education</h2>
+      <textarea id="education" placeholder="Education Details"></textarea>
 
-      <label>Education:</label>
-      <textarea name="education" id="education" rows="4" required></textarea>
+      <h2>Activities</h2>
+      <textarea id="activities" placeholder="Additional Activities"></textarea>
 
-      <label>Experience:</label>
-      <textarea name="experience" id="experience" rows="4"></textarea>
+      <h2>Skills</h2>
+      <textarea id="skills" placeholder="Skills (one per line)"></textarea>
 
-      <label>Skills:</label>
-      <textarea name="skills" id="skills" rows="3"></textarea>
-
-      <button type="button" onclick="generatePDF()">Download CV (PDF)</button>
+      <button type="button" onclick="updatePreview()">Update Preview</button>
+      <button type="button" onclick="downloadPDF()">Download PDF</button>
     </form>
+
+    <div id="cv-preview">
+      <h1 id="preview-name">Your Name</h1>
+      <h3 id="preview-title">Job Title</h3>
+      <p><strong>Phone:</strong> <span id="preview-phone"></span> &nbsp;&nbsp; 
+        <strong>LinkedIn:</strong> <span id="preview-linkedin"></span><br>
+        <strong>Email:</strong> <span id="preview-email"></span></p>
+
+      <p id="preview-summary"></p>
+
+      <div class="section">
+        <h2>Experience</h2>
+        <div id="preview-experience"></div>
+      </div>
+      <div class="section">
+        <h2>Education</h2>
+        <div id="preview-education"></div>
+      </div>
+      <div class="section">
+        <h2>Additional Activities</h2>
+        <div id="preview-activities"></div>
+      </div>
+      <div class="section">
+        <h2>Skills</h2>
+        <ul id="preview-skills"></ul>
+      </div>
+    </div>
   </div>
 
   <script>
-    async function generatePDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
+    function updatePreview() {
+      document.getElementById("preview-name").innerText = document.getElementById("name").value;
+      document.getElementById("preview-title").innerText = document.getElementById("title").value;
+      document.getElementById("preview-phone").innerText = document.getElementById("phone").value;
+      document.getElementById("preview-email").innerText = document.getElementById("email").value;
+      document.getElementById("preview-linkedin").innerText = document.getElementById("linkedin").value;
+      document.getElementById("preview-summary").innerText = document.getElementById("summary").value;
+      document.getElementById("preview-experience").innerText = document.getElementById("experience").value;
+      document.getElementById("preview-education").innerText = document.getElementById("education").value;
+      document.getElementById("preview-activities").innerText = document.getElementById("activities").value;
 
-      const fullName = document.getElementById("full_name").value;
-      const email = document.getElementById("email").value;
-      const phone = document.getElementById("phone").value;
-      const education = document.getElementById("education").value;
-      const experience = document.getElementById("experience").value;
-      const skills = document.getElementById("skills").value;
+      const skills = document.getElementById("skills").value.split("\n");
+      const skillList = document.getElementById("preview-skills");
+      skillList.innerHTML = "";
+      skills.forEach(skill => {
+        if(skill.trim()) {
+          const li = document.createElement("li");
+          li.innerText = skill.trim();
+          skillList.appendChild(li);
+        }
+      });
+    }
 
-      let y = 10;
-
-      doc.setFont("Helvetica", "bold");
-      doc.setFontSize(18);
-      doc.text("Curriculum Vitae", 105, y, { align: "center" });
-
-      y += 15;
-      doc.setFontSize(12);
-      doc.setFont("Helvetica", "normal");
-      doc.text(`Name: ${fullName}`, 10, y);
-
-      y += 8;
-      doc.text(`Email: ${email}`, 10, y);
-
-      y += 8;
-      doc.text(`Phone: ${phone}`, 10, y);
-
-      y += 10;
-      doc.setFont("Helvetica", "bold");
-      doc.text("Education:", 10, y);
-      y += 8;
-      doc.setFont("Helvetica", "normal");
-      doc.text(education, 10, y);
-      y += education.split("\n").length * 8;
-
-      doc.setFont("Helvetica", "bold");
-      doc.text("Experience:", 10, y);
-      y += 8;
-      doc.setFont("Helvetica", "normal");
-      doc.text(experience, 10, y);
-      y += experience.split("\n").length * 8;
-
-      doc.setFont("Helvetica", "bold");
-      doc.text("Skills:", 10, y);
-      y += 8;
-      doc.setFont("Helvetica", "normal");
-      doc.text(skills, 10, y);
-
-      doc.save(`${fullName.replace(" ", "_")}_CV.pdf`);
+    function downloadPDF() {
+      const element = document.getElementById("cv-preview");
+      html2pdf().from(element).save("cv.pdf");
     }
   </script>
 </body>
