@@ -74,6 +74,12 @@
       margin-left: 20px;
     }
 
+    hr {
+      border: 0;
+      border-top: 1px solid #ccc;
+      margin: 20px 0;
+    }
+
     @media print {
       .page-break {
         page-break-before: always;
@@ -245,46 +251,37 @@
               const subtopicDiv = document.createElement('div');
               const subtopicTitleElem = document.createElement('h3');
               subtopicTitleElem.innerText = subtopicTitle;
-
-              const ul = document.createElement('ul');
-              subtopicContent.split('\n').forEach(bullet => {
-                if (bullet.trim()) {
-                  const li = document.createElement('li');
-                  li.innerText = bullet.trim();
-                  ul.appendChild(li);
-                }
+              const subtopicContentElem = document.createElement('ul');
+              const subtopicPoints = subtopicContent.split('\n');
+              
+              subtopicPoints.forEach(point => {
+                const listItem = document.createElement('li');
+                listItem.innerText = point;
+                subtopicContentElem.appendChild(listItem);
               });
 
               subtopicDiv.appendChild(subtopicTitleElem);
-              subtopicDiv.appendChild(ul);
-              sectionDiv.appendChild(subtopicDiv);
+              subtopicDiv.appendChild(subtopicContentElem);
+              subtopicElems.push(subtopicDiv);
             }
           });
 
+          subtopicElems.forEach(subtopic => sectionDiv.appendChild(subtopic));
           dynamicSectionsPreview.appendChild(sectionDiv);
+          dynamicSectionsPreview.appendChild(document.createElement('hr')); // Add line after each section
         }
       });
     }
 
     function downloadPDF() {
       const element = document.getElementById("cv-preview");
-      const opt = {
-        margin: [10, 10, 10, 10],
-        filename: 'cv.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          scrollY: 0,
-          useCORS: true
-        },
-        jsPDF: {
-          unit: 'mm',
-          format: 'a4',
-          orientation: 'portrait'
-        },
-        pagebreak: { mode: ['css', 'legacy'] }
+      const options = {
+        filename: "cv.pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
       };
-      html2pdf().set(opt).from(element).save();
+      html2pdf().from(element).set(options).save();
     }
   </script>
 </body>
